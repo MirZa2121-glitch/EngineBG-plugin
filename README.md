@@ -4,6 +4,10 @@ Hello everyone! This is my first plugin project, created specifically to assist 
 
 It’s very simple! Think of **EngineBG** as a website construction kit with 20+ ready-made blocks (Headers, Hero sections, Cards, Footers). Blocks are created using a drag-and-drop method: just grab a block and drag it directly onto your Figma canvas, placing it exactly where you want. You can also customize them easily—since the blocks come with a clean layout grid and Auto Layout, it’s simple to see how everything is positioned. Full documentation will be available soon.
 
+## Ps. 
+
+Regarding the "Headers" blocks: they were originally designed for a 1200px grid. So, don’t be alarmed by their width when you first create one—you can set the size to 1200px, and they will then expand to fill the entire 1200px container.
+
 ## Used stack
 - React
 - TypeScript

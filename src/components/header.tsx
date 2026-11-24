@@ -59,6 +59,9 @@ function HeaderPreview({ blockId, title, detail, children }: HeaderPreviewProps)
           <div className="min-w-0">
             <p className="truncate text-[10px] font-semibold text-slate-800">{title}</p>
             <p className="mt-0.5 text-[9px] text-slate-400">{detail}</p>
+            <p className="mt-1 text-[8px] leading-relaxed text-indigo-500">
+              Content up to 1200 px · Resize the frame to fit your layout
+            </p>
           </div>
           <span className="shrink-0 rounded-md bg-indigo-50 px-2 py-1 text-[8px] font-semibold uppercase tracking-wide text-indigo-600 transition-colors group-hover:bg-indigo-100">
             Drag to canvas

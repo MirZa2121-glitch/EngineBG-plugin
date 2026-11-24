@@ -22,6 +22,7 @@ import {
 import { Service1, Service2, Service3 } from './src/components/service';
 import { Footer1, Footer2, Footer3, Footer4, Footer5, Footer6 } from './src/components/footer';
 import { ArabicContact, ArabicIntro, ArabicServices } from './src/components/arabic';
+import { Cards1, Cards2, Cards3, Cards4, Cards5 } from './src/components/cards';
 
 const CATEGORIES = [
   {
@@ -54,6 +55,18 @@ const CATEGORIES = [
     ],
   },
   {
+    id: 'cards',
+    label: 'Cards',
+    subcategories: [
+      { id: 'cards-all', label: 'All cards' },
+      { id: 'cards-feature', label: 'Feature cards' },
+      { id: 'cards-portfolio', label: 'Portfolio' },
+      { id: 'cards-pricing', label: 'Pricing' },
+      { id: 'cards-testimonial', label: 'Testimonials' },
+      { id: 'cards-team', label: 'Team profiles' },
+    ],
+  },
+  {
     id: 'footer',
     label: 'Footer',
     subcategories: [
@@ -75,7 +88,6 @@ const CATEGORIES = [
       { id: 'arabic-contact', label: 'Contact' },
     ],
   },
-  { id: 'cards', label: 'Cards', subcategories: [] },
 ];
 
 const HEADER_BLOCKS = [
@@ -119,6 +131,14 @@ const ARABIC_BLOCKS = [
   { id: 'arabic-contact', Component: ArabicContact },
 ];
 
+const CARD_BLOCKS = [
+  { id: 'cards-1', Component: Cards1, type: 'feature' },
+  { id: 'cards-2', Component: Cards2, type: 'portfolio' },
+  { id: 'cards-3', Component: Cards3, type: 'pricing' },
+  { id: 'cards-4', Component: Cards4, type: 'testimonial' },
+  { id: 'cards-5', Component: Cards5, type: 'team' },
+];
+
 function App() {
   const [activeCat, setActiveCat] = useState('headers');
   const [activeSub, setActiveSub] = useState('headers-all');
@@ -149,6 +169,10 @@ function App() {
   });
   const visibleArabicBlocks = ARABIC_BLOCKS.filter((block) => {
     return activeSub === 'arabic-all' || activeSub === block.id;
+  });
+  const visibleCards = CARD_BLOCKS.filter((block) => {
+    if (activeSub === 'cards-all') return true;
+    return activeSub === `cards-${block.type}`;
   });
 
   const handleSelectCategory = (catId: string, firstSub?: string) => {
@@ -243,6 +267,8 @@ function App() {
                         ? 'Footers'
                         : activeCat === 'arabic'
                           ? 'Arabic / RTL blocks'
+                            : activeCat === 'cards'
+                              ? 'Cards'
                     : CATEGORIES.find((cat) => cat.id === activeCat)?.label}
               </h1>
               <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
@@ -260,6 +286,8 @@ function App() {
                       ? `${visibleFooters.length} ${visibleFooters.length === 1 ? 'block' : 'blocks'}`
                       : activeCat === 'arabic'
                         ? `${visibleArabicBlocks.length} ${visibleArabicBlocks.length === 1 ? 'block' : 'blocks'}`
+                        : activeCat === 'cards'
+                          ? `${visibleCards.length} ${visibleCards.length === 1 ? 'block' : 'blocks'}`
                   : 'Coming soon'}
             </span>
           </div>
@@ -363,6 +391,34 @@ function App() {
               <Component key={id} />
             ))}
           </div>
+        )}
+
+        {activeCat === 'cards' && (
+          <>
+            <div className="flex flex-col gap-3">
+              {visibleCards.map(({ id, Component }) => (
+                <Component key={id} />
+              ))}
+            </div>
+            <section className="mt-4 rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-sm shadow-slate-200/40">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-[10px] font-semibold text-slate-800">Card grid system</h2>
+                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[8px] font-semibold text-emerald-700">Auto Layout wrap</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  ['Canvas', '1440 px'],
+                  ['Grid', '12 columns'],
+                  ['Card gap', '24 px'],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-lg bg-slate-50 px-2 py-2">
+                    <p className="text-[8px] font-medium text-slate-400">{label}</p>
+                    <p className="mt-1 text-[10px] font-semibold text-slate-700">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
         )}
       </main>
     </div>

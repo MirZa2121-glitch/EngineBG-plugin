@@ -133,11 +133,19 @@ function createIntroCanvas(blockId: string, name: string, x: number, y: number) 
   frame.strokeWeight = 1;
   frame.cornerRadius = 16;
   frame.setPluginData('blockId', blockId);
+  frame.layoutMode = 'VERTICAL';
+  frame.primaryAxisSizingMode = 'FIXED';
+  frame.counterAxisSizingMode = 'FIXED';
+  frame.primaryAxisAlignItems = 'CENTER';
+  frame.counterAxisAlignItems = 'CENTER';
+  frame.itemSpacing = 0;
+  frame.paddingTop = 0;
+  frame.paddingBottom = 0;
+  frame.paddingLeft = 0;
+  frame.paddingRight = 0;
 
   const container = figma.createFrame();
   container.name = 'Container / max 1200 / px-4';
-  container.x = 120;
-  container.y = 0;
   container.resize(1200, 900);
   container.fills = [];
   container.layoutGrids = [
@@ -321,8 +329,17 @@ async function createIntro(blockId: string, x: number, y: number): Promise<void>
     'intro-1': 'Intro 1 / Centered',
     'intro-2': 'Intro 2 / Editorial',
     'intro-3': 'Intro 3 / Video',
+    'intro-4': 'Intro 4 / EngineBG',
+    'intro-5': 'Intro 5 / Product launch',
+    'intro-6': 'Intro 6 / Results',
+    'intro-7': 'Intro 7 / Features',
+    'intro-8': 'Intro 8 / Story video',
   };
-  const { frame, container } = createIntroCanvas(blockId, labels[blockId], x, y);
+  const label = labels[blockId];
+  if (!label) {
+    throw new Error(`Unknown intro block: ${blockId}`);
+  }
+  const { frame, container } = createIntroCanvas(blockId, label, x, y);
 
   if (blockId === 'intro-1') {
     const content = figma.createFrame();
@@ -1071,6 +1088,258 @@ async function createService(blockId: string, x: number, y: number): Promise<voi
   figma.currentPage.selection = [frame];
 }
 
+function createCardGrid(container: FrameNode, y: number, height: number) {
+  const grid = figma.createFrame();
+  grid.name = 'Cards / Responsive wrap grid';
+  grid.x = 16;
+  grid.y = y;
+  grid.resize(1168, height);
+  grid.fills = [];
+  grid.layoutMode = 'HORIZONTAL';
+  grid.primaryAxisSizingMode = 'FIXED';
+  grid.counterAxisSizingMode = 'FIXED';
+  grid.primaryAxisAlignItems = 'MIN';
+  grid.counterAxisAlignItems = 'MIN';
+  grid.layoutWrap = 'WRAP';
+  grid.itemSpacing = 24;
+  grid.counterAxisSpacing = 24;
+  container.appendChild(grid);
+  return grid;
+}
+
+function createResponsiveCard(name: string, width: number, height: number, dark = false) {
+  const card = createPanel(name, 0, 0, width, height);
+  card.layoutSizingHorizontal = 'FIXED';
+  card.layoutSizingVertical = 'FIXED';
+  if (dark) {
+    card.fills = [{ type: 'SOLID', color: { r: 0.29, g: 0.34, b: 0.78 } }];
+    card.strokes = [];
+  }
+  return card;
+}
+
+function createCardHeader(container: FrameNode, eyebrow: string, heading: string, description: string) {
+  const header = figma.createFrame();
+  header.name = 'Section heading';
+  header.x = 16;
+  header.y = 120;
+  header.resize(1168, 190);
+  header.fills = [];
+  header.layoutMode = 'VERTICAL';
+  header.primaryAxisSizingMode = 'FIXED';
+  header.counterAxisSizingMode = 'FIXED';
+  header.primaryAxisAlignItems = 'MIN';
+  header.counterAxisAlignItems = 'MIN';
+  header.itemSpacing = 12;
+  header.appendChild(createIntroEyebrow(eyebrow));
+  header.appendChild(createIntroText(
+    'Heading',
+    heading,
+    52,
+    60,
+    { r: 0.06, g: 0.09, b: 0.16 },
+    1168,
+    'LEFT',
+    'Bold',
+  ));
+  header.appendChild(createIntroText(
+    'Description',
+    description,
+    18,
+    28,
+    { r: 0.36, g: 0.39, b: 0.46 },
+    900,
+  ));
+  container.appendChild(header);
+}
+
+async function createCards(blockId: string, x: number, y: number): Promise<void> {
+  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+
+  const names: Record<string, string> = {
+    'cards-1': 'Cards 1 / Features',
+    'cards-2': 'Cards 2 / Portfolio',
+    'cards-3': 'Cards 3 / Pricing',
+    'cards-4': 'Cards 4 / Testimonials',
+    'cards-5': 'Cards 5 / Team',
+  };
+  const name = names[blockId];
+  if (!name) {
+    throw new Error(`Unknown card block: ${blockId}`);
+  }
+  const { frame, container } = createIntroCanvas(blockId, name, x, y);
+
+  if (blockId === 'cards-1') {
+    createCardHeader(
+      container,
+      'What we do',
+      'Simple cards, clear value.',
+      'A flexible foundation for presenting key benefits at a glance.',
+    );
+    const grid = createCardGrid(container, 350, 420);
+    const items = [
+      ['01', 'Thoughtful strategy', 'Get a clear direction and a strong foundation for the work ahead.'],
+      ['02', 'Useful design', 'Make every interaction feel simple, clear, and considered.'],
+      ['03', 'Reliable delivery', 'Turn the final design into a product ready for real people.'],
+    ];
+    for (const [number, title, description] of items) {
+      const card = createResponsiveCard(`Feature / ${title}`, 368, 340);
+      card.appendChild(createIntroText('Number', number, 14, 20, { r: 0.29, g: 0.34, b: 0.78 }, 312, 'LEFT', 'Bold'));
+      card.appendChild(createIntroText('Title', title, 23, 30, { r: 0.09, g: 0.12, b: 0.19 }, 312, 'LEFT', 'Bold'));
+      card.appendChild(createIntroText('Description', description, 16, 24, { r: 0.36, g: 0.39, b: 0.46 }, 312));
+      card.appendChild(createIntroText('Link', 'Learn more  ↗', 15, 22, { r: 0.29, g: 0.34, b: 0.78 }, 312, 'LEFT', 'Bold'));
+      grid.appendChild(card);
+    }
+  }
+
+  if (blockId === 'cards-2') {
+    createCardHeader(
+      container,
+      'Selected work',
+      'A few things we’ve made.',
+      'Image-led project cards for portfolios, case studies, and editorial grids.',
+    );
+    const grid = createCardGrid(container, 350, 440);
+    const items = [
+      ['01 / 03', 'Atelier No. 8', 'Brand identity · 2025', { r: 0.91, g: 0.72, b: 0.7 }],
+      ['02 / 03', 'Common Ground', 'Digital product · 2024', { r: 0.65, g: 0.83, b: 0.78 }],
+      ['03 / 03', 'Sunday Objects', 'Art direction · 2024', { r: 0.94, g: 0.79, b: 0.59 }],
+    ] as const;
+    for (const [number, title, detail, color] of items) {
+      const card = createResponsiveCard(`Project / ${title}`, 368, 360);
+      const image = figma.createFrame();
+      image.name = 'Image placeholder / replace with artwork';
+      image.resize(312, 190);
+      image.fills = [{ type: 'SOLID', color }];
+      image.cornerRadius = 12;
+      image.layoutMode = 'HORIZONTAL';
+      image.primaryAxisSizingMode = 'FIXED';
+      image.counterAxisSizingMode = 'FIXED';
+      image.primaryAxisAlignItems = 'CENTER';
+      image.counterAxisAlignItems = 'CENTER';
+      image.appendChild(createIntroText('Artwork label', 'PROJECT IMAGE', 12, 18, { r: 0.2, g: 0.23, b: 0.3 }, 180, 'CENTER', 'Bold'));
+      card.appendChild(image);
+      card.appendChild(createIntroText('Index', number, 13, 18, { r: 0.45, g: 0.48, b: 0.55 }, 312));
+      card.appendChild(createIntroText('Project title', title, 22, 28, { r: 0.09, g: 0.12, b: 0.19 }, 312, 'LEFT', 'Bold'));
+      card.appendChild(createIntroText('Project category', detail, 15, 22, { r: 0.45, g: 0.48, b: 0.55 }, 312));
+      grid.appendChild(card);
+    }
+  }
+
+  if (blockId === 'cards-3') {
+    createCardHeader(
+      container,
+      'Straightforward pricing',
+      'Pick the right starting point.',
+      'A clear plan comparison with one option visually highlighted.',
+    );
+    const grid = createCardGrid(container, 350, 460);
+    const plans = [
+      ['Starter', '$29', 'For small teams getting started.', ['Core components', 'Email support']],
+      ['Studio', '$79', 'For teams ready to do more.', ['Advanced blocks', 'Priority support']],
+      ['Scale', '$149', 'For growing teams and systems.', ['Team libraries', 'Dedicated help']],
+    ] as const;
+    for (let index = 0; index < plans.length; index += 1) {
+      const [plan, price, description, features] = plans[index];
+      const featured = index === 1;
+      const card = createResponsiveCard(`Plan / ${plan}`, 368, 390, featured);
+      const textColor = featured ? { r: 1, g: 1, b: 1 } : { r: 0.09, g: 0.12, b: 0.19 };
+      const mutedColor = featured ? { r: 0.87, g: 0.88, b: 0.97 } : { r: 0.4, g: 0.43, b: 0.5 };
+      card.appendChild(createIntroText('Plan', plan, 16, 24, mutedColor, 312, 'LEFT', 'Bold'));
+      card.appendChild(createIntroText('Price', `${price} / month`, 38, 48, textColor, 312, 'LEFT', 'Bold'));
+      card.appendChild(createIntroText('Description', description, 15, 22, mutedColor, 312));
+      card.appendChild(createIntroText('Included', 'Includes', 14, 20, mutedColor, 312, 'LEFT', 'Bold'));
+      for (const feature of features) {
+        card.appendChild(createIntroText('Plan feature', `✓  ${feature}`, 15, 22, textColor, 312));
+      }
+      const action = createIntroButton(`Choose ${plan}`, !featured);
+      if (featured) {
+        action.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+        const label = action.children[0];
+        if (label.type === 'TEXT') {
+          label.fills = [{ type: 'SOLID', color: { r: 0.29, g: 0.34, b: 0.78 } }];
+        }
+      }
+      card.appendChild(action);
+      grid.appendChild(card);
+    }
+  }
+
+  if (blockId === 'cards-4') {
+    createCardHeader(
+      container,
+      'Kind words',
+      'Good work, good people.',
+      'Quote-forward cards for customer stories and social proof.',
+    );
+    const grid = createCardGrid(container, 350, 420);
+    const testimonials = [
+      ['The team brought clarity to a complicated launch. Every detail felt considered, and the result made an immediate difference.', 'Maya Chen', 'Founder, Common Ground', 'MC'],
+      ['A rare mix of thoughtful design and practical delivery. We left with a system our whole team can use confidently.', 'Jonas Reed', 'Product lead, Northstar', 'JR'],
+    ];
+    for (const [quote, name, role, initials] of testimonials) {
+      const card = createResponsiveCard(`Testimonial / ${name}`, 572, 300);
+      card.appendChild(createIntroText('Quote mark', '“', 52, 58, { r: 0.29, g: 0.34, b: 0.78 }, 500, 'LEFT', 'Bold'));
+      card.appendChild(createIntroText('Quote', quote, 20, 30, { r: 0.2, g: 0.23, b: 0.3 }, 516));
+      const attribution = figma.createFrame();
+      attribution.name = 'Customer';
+      attribution.resize(516, 56);
+      attribution.fills = [];
+      attribution.layoutMode = 'HORIZONTAL';
+      attribution.primaryAxisSizingMode = 'FIXED';
+      attribution.counterAxisSizingMode = 'FIXED';
+      attribution.counterAxisAlignItems = 'CENTER';
+      attribution.itemSpacing = 16;
+      attribution.appendChild(createIntroText('Initials', initials, 14, 20, { r: 0.29, g: 0.34, b: 0.78 }, 52, 'CENTER', 'Bold'));
+      const attributionText = figma.createFrame();
+      attributionText.name = 'Name and role';
+      attributionText.resize(440, 52);
+      attributionText.fills = [];
+      attributionText.layoutMode = 'VERTICAL';
+      attributionText.primaryAxisSizingMode = 'FIXED';
+      attributionText.counterAxisSizingMode = 'FIXED';
+      attributionText.itemSpacing = 4;
+      attributionText.appendChild(createIntroText('Name', name, 15, 20, { r: 0.09, g: 0.12, b: 0.19 }, 440, 'LEFT', 'Bold'));
+      attributionText.appendChild(createIntroText('Role', role, 13, 18, { r: 0.45, g: 0.48, b: 0.55 }, 440));
+      attribution.appendChild(attributionText);
+      card.appendChild(attribution);
+      grid.appendChild(card);
+    }
+  }
+
+  if (blockId === 'cards-5') {
+    createCardHeader(
+      container,
+      'Meet the team',
+      'Small team. Big care.',
+      'A compact profile grid for introducing the people behind the work.',
+    );
+    const grid = createCardGrid(container, 350, 420);
+    const people = [
+      ['AL', 'Alex Lee', 'Creative director', { r: 0.78, g: 0.75, b: 0.94 }],
+      ['SM', 'Sam Morgan', 'Product designer', { r: 0.94, g: 0.77, b: 0.72 }],
+      ['JR', 'Jamie Rivera', 'Design engineer', { r: 0.69, g: 0.86, b: 0.84 }],
+      ['TK', 'Taylor Kim', 'Project lead', { r: 0.94, g: 0.83, b: 0.63 }],
+    ] as const;
+    for (const [initials, name, role, color] of people) {
+      const card = createResponsiveCard(`Team member / ${name}`, 268, 330);
+      const avatar = figma.createEllipse();
+      avatar.name = `Avatar / ${initials}`;
+      avatar.resize(88, 88);
+      avatar.fills = [{ type: 'SOLID', color }];
+      card.appendChild(avatar);
+      card.appendChild(createIntroText('Name', name, 19, 26, { r: 0.09, g: 0.12, b: 0.19 }, 212, 'LEFT', 'Bold'));
+      card.appendChild(createIntroText('Role', role, 14, 20, { r: 0.45, g: 0.48, b: 0.55 }, 212));
+      card.appendChild(createIntroText('Social link', 'LinkedIn  ↗', 14, 20, { r: 0.29, g: 0.34, b: 0.78 }, 212, 'LEFT', 'Bold'));
+      grid.appendChild(card);
+    }
+  }
+
+  figma.currentPage.appendChild(frame);
+  figma.currentPage.selection = [frame];
+}
+
 function createStandaloneFrame(blockId: string, name: string, height: number, background: RGB) {
   const frame = figma.createFrame();
   frame.name = name;
@@ -1565,7 +1834,9 @@ figma.on('drop', (event: DropEvent): false => {
     case 'intro-6':
     case 'intro-7':
     case 'intro-8':
-      void createIntro(blockData.blockId, absoluteX, absoluteY);
+      void createIntro(blockData.blockId, absoluteX, absoluteY).catch((error: unknown) => {
+        figma.notify(`Could not create intro block: ${error instanceof Error ? error.message : String(error)}`);
+      });
       break;
     case 'service-1':
     case 'service-2':
@@ -1584,6 +1855,15 @@ figma.on('drop', (event: DropEvent): false => {
     case 'arabic-services':
     case 'arabic-contact':
       void createArabicBlock(blockData.blockId, absoluteX, absoluteY);
+      break;
+    case 'cards-1':
+    case 'cards-2':
+    case 'cards-3':
+    case 'cards-4':
+    case 'cards-5':
+      void createCards(blockData.blockId, absoluteX, absoluteY).catch((error: unknown) => {
+        figma.notify(`Could not create card block: ${error instanceof Error ? error.message : String(error)}`);
+      });
       break;
     default:
       void createSection(blockData, absoluteX, absoluteY);
