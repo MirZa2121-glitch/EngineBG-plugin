@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["es6", "dom"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "outDir": "dist/plugin",
+    "rootDir": ".",
+    "noEmitOnError": true,
+    "types": ["@figma/plugin-typings", "vite/client"]
+  },
+  "include": ["code.ts"]
+}
